@@ -1,5 +1,4 @@
 import { FLOUR_GROUPS, FLOUR_KINDS, findFlourKind } from '../domain/flours'
-import type { FlourPart } from '../domain/types'
 import { useT } from '../i18n'
 
 const CUSTOM = 'custom'
@@ -13,8 +12,9 @@ export function FlourPicker({
   onChange,
   id,
 }: {
-  flour: FlourPart
-  onChange: (patch: Partial<FlourPart>) => void
+  /** `kind` is a catalogue id; a flour without one is a custom flour. */
+  flour: { kind?: string; name: string }
+  onChange: (patch: { kind: string | undefined; name: string }) => void
   id?: string
 }) {
   const t = useT()

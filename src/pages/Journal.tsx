@@ -1,6 +1,7 @@
 import { useId, useMemo, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { api } from '../api'
+import { FlourPicker } from '../components/FlourPicker'
 import { Icon } from '../components/Icon'
 import { NumberField, Segmented, Stars, useToast } from '../components/controls'
 import { useData } from '../data'
@@ -121,7 +122,7 @@ function blankFeeding(last?: StarterFeeding): StarterFeeding {
     seed: last?.seed ?? 20,
     flour: last?.flour ?? 100,
     water: last?.water ?? 100,
-    flourType: last?.flourType ?? '',
+    flourType: last?.flourType ?? 'Weissmehl',
     temp: last?.temp ?? null,
     risePercent: null,
     peakAt: null,
@@ -285,6 +286,8 @@ function FeedingForm({
   const t = useT()
   const set = (p: Partial<StarterFeeding>) => onChange({ ...value, ...p })
   const uid = useId()
+  // Feedings store the flour by name; recognise catalogue names so the picker shows them.
+  const flour = { kind: FLOUR_KINDS.find((k) => k.name === value.flourType)?.id, name: value.flourType }
   return (
     <section className="card fields">
       <h2 className="card-title">
@@ -344,18 +347,16 @@ function FeedingForm({
       </div>
       <div className="field">
         <label htmlFor={`${uid}-flourType`}>{t.starter.flourType}</label>
-        <input
-          id={`${uid}-flourType`}
-          className="input"
-          list={`${uid}-flours`}
-          value={value.flourType}
-          onChange={(e) => set({ flourType: e.target.value })}
-        />
-        <datalist id={`${uid}-flours`}>
-          {FLOUR_KINDS.map((k) => (
-            <option key={k.id} value={k.name} />
-          ))}
-        </datalist>
+        <FlourPicker id={`${uid}-flourType`} flour={flour} onChange={(p) => set({ flourType: p.name })} />
+        {!flour.kind && (
+          <input
+            className="input"
+            aria-label={t.calc.customFlourName}
+            placeholder={t.calc.customFlourName}
+            value={value.flourType}
+            onChange={(e) => set({ flourType: e.target.value })}
+          />
+        )}
       </div>
       <div className="field">
         <label htmlFor={`${uid}-fnotes`}>{t.common.notes}</label>
