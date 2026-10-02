@@ -6,6 +6,7 @@ import { Notice } from './components/controls'
 import { DataProvider, useData } from './data'
 import { useT } from './i18n'
 import BakeDetail from './pages/BakeDetail'
+import Guide from './pages/Guide'
 import Journal from './pages/Journal'
 import Login from './pages/Login'
 import RecipeEditor from './pages/RecipeEditor'
@@ -55,6 +56,10 @@ export default function App() {
             <Icon name="clock" />
             {t.nav.schedule}
           </NavLink>
+          <NavLink to="/guide">
+            <Icon name="list" />
+            {t.nav.guide}
+          </NavLink>
           <NavLink to="/journal">
             <Icon name="book" />
             {t.nav.journal}
@@ -70,6 +75,7 @@ export default function App() {
               <Route path="/" element={<Recipes />} />
               <Route path="/recipes/:id" element={<RecipeEditor />} />
               <Route path="/schedule" element={<SchedulePage />} />
+              <Route path="/guide" element={<Guide />} />
               <Route path="/journal" element={<Journal />} />
               <Route path="/journal/:id" element={<BakeDetail />} />
               <Route path="/stats" element={<Stats />} />

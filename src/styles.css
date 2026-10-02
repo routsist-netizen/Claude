@@ -208,7 +208,7 @@ main {
   inset: auto 0 0 0;
   z-index: 20;
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   height: calc(var(--nav-h) + env(safe-area-inset-bottom));
   padding-bottom: env(safe-area-inset-bottom);
   background: var(--paper);
@@ -223,13 +223,28 @@ main {
   gap: 2px;
   text-decoration: none;
   color: var(--muted);
-  font-size: 0.78rem;
+  font-size: 0.72rem;
   font-weight: 600;
-  letter-spacing: 0.01em;
+  white-space: nowrap;
 }
 .bottom-nav a svg {
   width: 26px;
   height: 26px;
+}
+.bottom-nav a {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+@media (max-width: 380px) {
+  .bottom-nav a {
+    font-size: 0.66rem;
+  }
+}
+@media (max-width: 340px) {
+  .bottom-nav a {
+    font-size: 0.6rem;
+  }
 }
 .bottom-nav a.active {
   color: var(--crust);
@@ -398,6 +413,11 @@ main {
   position: absolute;
   top: 14px;
   right: 14px;
+}
+.badge.plain {
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 0.85rem;
 }
 .badge.night {
   background: var(--night-soft);
@@ -1254,4 +1274,113 @@ details.more[open] summary::before {
 }
 .data-table .r {
   text-align: right;
+}
+
+/* ───────────── Baking guide ───────────── */
+.guide-progress {
+  height: 8px;
+  margin-top: 8px;
+  border-radius: 999px;
+  background: var(--paper-sunk);
+  overflow: hidden;
+}
+.guide-progress span {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--crust);
+  transition: width 0.25s ease;
+}
+.guide-steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 12px;
+}
+.guide-step {
+  display: grid;
+  grid-template-columns: var(--tap) minmax(0, 1fr);
+  column-gap: 12px;
+  row-gap: 4px;
+  padding: 14px;
+  border-radius: var(--radius);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+}
+.guide-step.done {
+  background: var(--paper-sunk);
+  box-shadow: none;
+}
+.guide-step.done .guide-head h2 {
+  text-decoration: line-through;
+  color: var(--muted);
+}
+.guide-check {
+  width: var(--tap);
+  height: var(--tap);
+  border-radius: 50%;
+  border: 2px solid var(--crust);
+  background: transparent;
+  color: transparent;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.guide-check svg {
+  width: 26px;
+  height: 26px;
+}
+.guide-step.done .guide-check {
+  background: var(--crust);
+  color: var(--crust-ink);
+}
+.guide-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+  min-height: var(--tap);
+}
+.guide-head h2 {
+  margin: 0;
+  font-size: 1.15rem;
+}
+.guide-more {
+  grid-column: 1 / -1;
+}
+.guide-more p {
+  margin: 0 0 0.6em;
+}
+.guide-weigh {
+  background: var(--paper-sunk);
+  border-radius: var(--radius-sm);
+  padding: 2px 12px 6px;
+  margin: 0 0 10px;
+}
+.guide-weigh h3 {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  margin: 8px 0 0;
+}
+.guide-tip {
+  display: flex;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--wheat-soft);
+  color: var(--crust-deep);
+  font-size: 0.92rem;
+}
+.guide-tip svg {
+  width: 20px;
+  height: 20px;
+  flex: none;
+  margin-top: 1px;
 }

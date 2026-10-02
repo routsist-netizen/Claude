@@ -1,10 +1,11 @@
 # Προζύμι — sourdough companion
 
-A mobile-first web app for home bread bakers (mainly sourdough), in Greek. Three tools share the same recipe data:
+A mobile-first web app for home bread bakers (mainly sourdough), in Greek. Four tools share the same recipe data:
 
 1. **Recipe calculator**: baker's percentages → exact grams, live. It handles flour blends picked from a catalogue of Swiss flours (Weissmehl, Halbweissmehl, Ruchmehl, Vollkornmehl, Dinkel, Roggen… with a suggested hydration for the blend) or any custom flour, levain (with its own flour and water subtracted so the final hydration is exact), optional yeast and inclusions. Recipes can be saved, edited and duplicated.
 2. **Backwards baking schedule**: pick a recipe, the time you want bread out of the oven and your kitchen temperature. The app works backwards through every step, scales fermentation to temperature, flags steps between 23:00 and 07:00, and suggests a cold retard or a shifted bake time. You can export the plan to your calendar (`.ics`) or get in-app notifications.
-3. **Bake journal**: logs each bake with a snapshot of the recipe, actual times and temperatures per step, notes, crust and crumb photos, and a 1–5 rating. It also has a starter feeding log and a stats view relating bulk time, hydration and temperature to your ratings.
+3. **Baking guide**: asks how you'll bake (Dutch oven, baking stone, plain tray, loaf tin or focaccia pan; by hand, stand mixer or no-knead; conventional or fan oven; room-temperature or cold proof) and then lists every step with the recipe's exact grams, temperature-adjusted times, oven temperatures (20 °C lower for a fan oven), steam/lid instructions and tick-off boxes. The same choices can be carried to the schedule so the preheat, bake, mixing and folding times match.
+4. **Bake journal**: logs each bake with a snapshot of the recipe, actual times and temperatures per step, notes, crust and crumb photos, and a 1–5 rating. It also has a starter feeding log and a stats view relating bulk time, hydration and temperature to your ratings.
 
 Four example recipes (country sourdough, Ruchbrot, 20% whole wheat, focaccia) are built in and marked "Παράδειγμα".
 
@@ -87,9 +88,9 @@ Bulk and proof also scale with the amount of levain, `(20 / levain%)^0.35`, and 
 ## Project layout
 
 ```
-src/domain/     pure logic + tests (recipe, schedule, ics, stats, journal, examples)
+src/domain/     pure logic + tests (recipe, schedule, method, guide, flours, ics, stats, journal, examples)
 src/i18n/el.ts  every Greek UI string, in one place
-src/pages/      screens (Recipes, RecipeEditor, Schedule, Journal, BakeDetail, Stats, Login)
+src/pages/      screens (Recipes, RecipeEditor, Schedule, Guide, Journal, BakeDetail, Stats, Login)
 src/components/ shared controls (number steppers, stars, icons)
 server/         API handler, auth and storage adapter (+ tests)
 netlify/        the Netlify Function entry point

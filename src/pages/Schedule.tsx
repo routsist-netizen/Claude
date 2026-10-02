@@ -5,6 +5,7 @@ import { Notice, NumberField, Segmented, useToast } from '../components/controls
 import { useData } from '../data'
 import { actionsToEvents, toIcs } from '../domain/ics'
 import { bakeFromSchedule } from '../domain/journal'
+import { applyMethod, methodFromParams, type BakeMethod } from '../domain/method'
 import {
   buildSchedule,
   DEFAULT_QUIET,
@@ -18,6 +19,7 @@ import {
 } from '../domain/schedule'
 import type { ProofMode, Recipe, ScheduleSettings, StepKey } from '../domain/types'
 import { duration, fromLocalInput, num, relativeDay, time, toLocalInput, useT } from '../i18n'
+import { readPref, writePref } from '../prefs'
 import { armedFor, armReminders, clearReminders, notificationsSupported, requestPermission } from '../notify'
 
 const STEP_COLORS: Record<StepKey, string> = {
@@ -44,22 +46,6 @@ const ACTION_STEP: Partial<Record<ActionKind, StepKey>> = {
   bake: 'bake',
 }
 
-function readPref<T>(key: string, fallback: T): T {
-  try {
-    const v = localStorage.getItem(`prozymi.${key}`)
-    return v === null ? fallback : (JSON.parse(v) as T)
-  } catch {
-    return fallback
-  }
-}
-function writePref(key: string, value: unknown) {
-  try {
-    localStorage.setItem(`prozymi.${key}`, JSON.stringify(value))
-  } catch {
-    /* private mode */
-  }
-}
-
 /** First quarter hour at which a bake of this length can finish if you start in 15 minutes. */
 function earliestTarget(totalMinutes: number): Date {
   const q = 15 * 60_000
@@ -78,11 +64,14 @@ export default function SchedulePage() {
   const { allRecipes, findRecipe } = useData()
   const [params, setParams] = useSearchParams()
   const recipe = findRecipe(params.get('recipe')) ?? allRecipes[0]
+  // Coming from the guide, the chosen vessel/mixing/oven set the preheat, bake and folding times.
+  const method = methodFromParams(params)
 
   if (!recipe) return <Notice>{t.schedule.noRecipes}</Notice>
   return (
     <Planner
-      key={recipe.id}
+      key={`${recipe.id}|${method ? JSON.stringify(method) : ''}`}
+      method={method}
       recipe={recipe}
       recipes={allRecipes}
       onPick={(id) => setParams({ recipe: id }, { replace: true })}
@@ -90,7 +79,17 @@ export default function SchedulePage() {
   )
 }
 
-function Planner({ recipe, recipes, onPick }: { recipe: Recipe; recipes: Recipe[]; onPick: (id: string) => void }) {
+function Planner({
+  recipe,
+  recipes,
+  method,
+  onPick,
+}: {
+  recipe: Recipe
+  recipes: Recipe[]
+  method: BakeMethod | null
+  onPick: (id: string) => void
+}) {
   const t = useT()
   const navigate = useNavigate()
   const { save } = useData()
@@ -102,7 +101,7 @@ function Planner({ recipe, recipes, onPick }: { recipe: Recipe; recipes: Recipe[
     return d && d.getTime() > Date.now() ? d : defaultTarget()
   })
   const [kitchenTemp, setKitchenTemp] = useState<number>(() => readPref('kitchenTemp', 22))
-  const [settings, setSettings] = useState<ScheduleSettings>(() => structuredClone(recipe.schedule))
+  const [settings, setSettings] = useState<ScheduleSettings>(() => structuredClone(method ? applyMethod(recipe.schedule, method) : recipe.schedule))
   const [notifyKey, setNotifyKey] = useState<string | null>(armedFor())
 
   const input = useMemo(
@@ -339,6 +338,15 @@ function Planner({ recipe, recipes, onPick }: { recipe: Recipe; recipes: Recipe[
           <p className="help">
             {t.schedule.startBakeHelp} {t.schedule.notifyHelp}
           </p>
+          {method && (
+            <p className="help" style={{ marginTop: -8 }}>
+              {t.schedule.methodNote(t.guide.vessels[method.vessel].name, t.guide.mixings[method.mixing].name)}
+            </p>
+          )}
+          <Link to={`/guide?recipe=${recipe.id}`} className="btn small" style={{ justifySelf: 'start' }}>
+            <Icon name="list" />
+            {t.schedule.guideLink}
+          </Link>
           <Link to={`/recipes/${recipe.id}`} className="btn ghost small" style={{ justifySelf: 'start' }}>
             <Icon name="scale" />
             {recipe.name}
