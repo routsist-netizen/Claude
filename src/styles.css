@@ -507,7 +507,9 @@ main {
 /* ───────────── Forms ───────────── */
 .field {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 6px;
+  min-width: 0;
 }
 .field > label,
 .field-label {
@@ -534,6 +536,10 @@ textarea.input {
   min-height: 120px;
   resize: vertical;
   line-height: 1.5;
+}
+.input::placeholder {
+  color: var(--muted);
+  opacity: 0.6;
 }
 .input:focus {
   border-color: var(--wheat);
