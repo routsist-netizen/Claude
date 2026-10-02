@@ -1,5 +1,7 @@
 import { useEffect, useId, useState, type ReactNode } from 'react'
 import { num, parseNum, useT } from '../i18n'
+import { findFlourKind } from '../domain/flours'
+import type { FlourPart } from '../domain/types'
 import { Icon } from './Icon'
 
 interface NumberFieldProps {
@@ -153,9 +155,11 @@ export function useToast(): [ReactNode, (msg: string) => void] {
 }
 
 const FLOUR_COLORS = ['#e9c98f', '#a86a3c', '#7a4a2a', '#d9a23f', '#c7b299', '#5f7a4d']
-export const flourColor = (i: number) => FLOUR_COLORS[i % FLOUR_COLORS.length]
+/** Catalogue flours get their own colour; custom ones cycle through a fallback set. */
+export const flourColor = (f: Pick<FlourPart, 'kind'>, i: number) =>
+  findFlourKind(f.kind)?.color ?? FLOUR_COLORS[i % FLOUR_COLORS.length]
 
-export function FlourBar({ flours }: { flours: { id: string; name: string; percent: number }[] }) {
+export function FlourBar({ flours }: { flours: FlourPart[] }) {
   const total = flours.reduce((s, f) => s + Math.max(0, f.percent || 0), 0) || 1
   return (
     <div className="flour-bar" aria-hidden="true">
@@ -163,7 +167,7 @@ export function FlourBar({ flours }: { flours: { id: string; name: string; perce
         <span
           key={f.id}
           title={f.name}
-          style={{ width: `${(Math.max(0, f.percent || 0) / total) * 100}%`, background: flourColor(i) }}
+          style={{ width: `${(Math.max(0, f.percent || 0) / total) * 100}%`, background: flourColor(f, i) }}
         />
       ))}
     </div>

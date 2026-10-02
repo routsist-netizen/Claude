@@ -1,11 +1,13 @@
 import { useMemo, useState } from 'react'
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom'
+import { FlourPicker } from '../components/FlourPicker'
 import { Icon } from '../components/Icon'
 import { flourColor, FlourBar, Notice, NumberField, useToast } from '../components/controls'
 import { useData } from '../data'
 import { blankRecipe, copyRecipe } from '../domain/factory'
+import { findFlourKind, nextFlourKind, suggestedHydration } from '../domain/flours'
 import { calculate, flourSum, newId, type Issue } from '../domain/recipe'
-import type { Recipe, RecipeFormula } from '../domain/types'
+import type { FlourPart, Recipe, RecipeFormula } from '../domain/types'
 import { grams, num, useT } from '../i18n'
 
 export default function RecipeEditor() {
@@ -13,7 +15,7 @@ export default function RecipeEditor() {
   const { findRecipe } = useData()
   const t = useT()
   const initial = useMemo(
-    () => (id === 'new' ? blankRecipe(t.recipes.newName, t.calc.defaultFlour) : findRecipe(id)),
+    () => (id === 'new' ? blankRecipe(t.recipes.newName) : findRecipe(id)),
     // Only on first render for this id: the editor owns the draft afterwards.
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [id],
@@ -37,6 +39,12 @@ function Editor({ initial, isNew }: { initial: Recipe; isNew: boolean }) {
   const isExample = !!draft.isExample
 
   const setFormula = (patch: Partial<RecipeFormula>) => setDraft((d) => ({ ...d, formula: { ...d.formula, ...patch } }))
+  const setFlour = (id: string, patch: Partial<FlourPart>) =>
+    setDraft((d) => ({
+      ...d,
+      formula: { ...d.formula, flours: d.formula.flours.map((x) => (x.id === id ? { ...x, ...patch } : x)) },
+    }))
+  const suggested = suggestedHydration(f.flours)
 
   const persist = async (recipe: Recipe, asNew: boolean) => {
     setBusy(true)
@@ -161,16 +169,9 @@ function Editor({ initial, isNew }: { initial: Recipe; isNew: boolean }) {
                   <div className="row" style={{ flexWrap: 'nowrap' }}>
                     <span
                       aria-hidden="true"
-                      style={{ width: 14, height: 14, borderRadius: 4, background: flourColor(i), flex: 'none' }}
+                      style={{ width: 14, height: 14, borderRadius: 4, background: flourColor(flour, i), flex: 'none' }}
                     />
-                    <input
-                      className="input"
-                      aria-label={t.calc.flourName}
-                      value={flour.name}
-                      onChange={(e) =>
-                        setFormula({ flours: f.flours.map((x) => (x.id === flour.id ? { ...x, name: e.target.value } : x)) })
-                      }
-                    />
+                    <FlourPicker flour={flour} onChange={(p) => setFlour(flour.id, p)} />
                   </div>
                   <button
                     type="button"
@@ -187,14 +188,23 @@ function Editor({ initial, isNew }: { initial: Recipe; isNew: boolean }) {
                   >
                     <Icon name="trash" />
                   </button>
+                  {findFlourKind(flour.kind) ? (
+                    <p className="help span">{t.calc.flourInfo[flour.kind!]}</p>
+                  ) : (
+                    <input
+                      className="input span"
+                      aria-label={t.calc.customFlourName}
+                      placeholder={t.calc.customFlourName}
+                      value={flour.name}
+                      onChange={(e) => setFlour(flour.id, { name: e.target.value })}
+                    />
+                  )}
                   <NumberField
                     value={flour.percent}
                     unit="%"
                     step={5}
                     max={100}
-                    onChange={(percent) =>
-                      setFormula({ flours: f.flours.map((x) => (x.id === flour.id ? { ...x, percent } : x)) })
-                    }
+                    onChange={(percent) => setFlour(flour.id, { percent })}
                   />
                 </div>
               ))}
@@ -206,11 +216,11 @@ function Editor({ initial, isNew }: { initial: Recipe; isNew: boolean }) {
               <button
                 type="button"
                 className="btn small"
-                onClick={() =>
-                  setFormula({
-                    flours: [...f.flours, { id: newId(), name: '', percent: Math.max(0, Math.round((100 - sum) * 10) / 10) }],
-                  })
-                }
+                onClick={() => {
+                  const kind = nextFlourKind(f.flours)
+                  const percent = Math.max(0, Math.round((100 - sum) * 10) / 10)
+                  setFormula({ flours: [...f.flours, { id: newId(), name: kind.name, kind: kind.id, percent }] })
+                }}
               >
                 <Icon name="plus" />
                 {t.calc.addFlour}
@@ -219,6 +229,14 @@ function Editor({ initial, isNew }: { initial: Recipe; isNew: boolean }) {
             <div style={{ marginTop: 12 }}>
               <FlourBar flours={f.flours} />
             </div>
+            {suggested !== null && Math.abs(suggested - f.hydration) >= 1 && (
+              <div className="suggestion" style={{ marginTop: 12, background: 'var(--wheat-soft)' }}>
+                <span className="small">{t.calc.suggestedHydration(num(suggested))}</span>
+                <button type="button" className="btn small" onClick={() => setFormula({ hydration: suggested })}>
+                  {t.calc.useSuggestion}
+                </button>
+              </div>
+            )}
           </section>
 
           <section className="card">

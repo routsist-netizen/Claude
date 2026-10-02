@@ -2,11 +2,11 @@
 
 A mobile-first web app for home bread bakers (mainly sourdough), in Greek. Three tools share the same recipe data:
 
-1. **Recipe calculator**: baker's percentages → exact grams, live. It handles flour blends, levain (with its own flour and water subtracted so the final hydration is exact), optional yeast and inclusions. Recipes can be saved, edited and duplicated.
+1. **Recipe calculator**: baker's percentages → exact grams, live. It handles flour blends picked from a catalogue of Swiss flours (Weissmehl, Halbweissmehl, Ruchmehl, Vollkornmehl, Dinkel, Roggen… with a suggested hydration for the blend) or any custom flour, levain (with its own flour and water subtracted so the final hydration is exact), optional yeast and inclusions. Recipes can be saved, edited and duplicated.
 2. **Backwards baking schedule**: pick a recipe, the time you want bread out of the oven and your kitchen temperature. The app works backwards through every step, scales fermentation to temperature, flags steps between 23:00 and 07:00, and suggests a cold retard or a shifted bake time. You can export the plan to your calendar (`.ics`) or get in-app notifications.
 3. **Bake journal**: logs each bake with a snapshot of the recipe, actual times and temperatures per step, notes, crust and crumb photos, and a 1–5 rating. It also has a starter feeding log and a stats view relating bulk time, hydration and temperature to your ratings.
 
-Three example recipes (country sourdough, 20% whole wheat, focaccia) are built in and marked "Παράδειγμα".
+Four example recipes (country sourdough, Ruchbrot, 20% whole wheat, focaccia) are built in and marked "Παράδειγμα".
 
 ## Stack
 

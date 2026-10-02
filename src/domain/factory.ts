@@ -2,7 +2,7 @@ import { newId } from './recipe'
 import { defaultScheduleSettings } from './schedule'
 import type { Recipe } from './types'
 
-export function blankRecipe(name: string, flourName: string): Recipe {
+export function blankRecipe(name: string): Recipe {
   const now = new Date().toISOString()
   const flourId = newId()
   return {
@@ -21,7 +21,7 @@ export function blankRecipe(name: string, flourName: string): Recipe {
       levainFlour: flourId,
       levainFeedRatio: 5,
       yeast: 0,
-      flours: [{ id: flourId, name: flourName, percent: 100 }],
+      flours: [{ id: flourId, name: 'Weissmehl', kind: 'weissmehl', percent: 100 }],
       inclusions: [],
     },
     schedule: defaultScheduleSettings(5),

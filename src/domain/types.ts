@@ -8,6 +8,8 @@ export interface FlourPart {
   name: string
   /** Share of the total flour, in %. All parts of a blend must sum to 100. */
   percent: number
+  /** Catalogue id (see flours.ts), e.g. 'ruchmehl'. Absent for a custom flour. */
+  kind?: string
 }
 
 export interface Inclusion {

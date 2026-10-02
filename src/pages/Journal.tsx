@@ -4,6 +4,7 @@ import { api } from '../api'
 import { Icon } from '../components/Icon'
 import { NumberField, Segmented, Stars, useToast } from '../components/controls'
 import { useData } from '../data'
+import { FLOUR_KINDS } from '../domain/flours'
 import { feedingRatio, peakMinutes, starterHydration } from '../domain/journal'
 import { newId } from '../domain/recipe'
 import { filterBakes } from '../domain/stats'
@@ -343,7 +344,18 @@ function FeedingForm({
       </div>
       <div className="field">
         <label htmlFor={`${uid}-flourType`}>{t.starter.flourType}</label>
-        <input id={`${uid}-flourType`} className="input" value={value.flourType} onChange={(e) => set({ flourType: e.target.value })} />
+        <input
+          id={`${uid}-flourType`}
+          className="input"
+          list={`${uid}-flours`}
+          value={value.flourType}
+          onChange={(e) => set({ flourType: e.target.value })}
+        />
+        <datalist id={`${uid}-flours`}>
+          {FLOUR_KINDS.map((k) => (
+            <option key={k.id} value={k.name} />
+          ))}
+        </datalist>
       </div>
       <div className="field">
         <label htmlFor={`${uid}-fnotes`}>{t.common.notes}</label>
